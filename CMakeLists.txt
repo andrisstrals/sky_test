@@ -2,10 +2,11 @@ cmake_minimum_required(VERSION 3.5)
 
 project(testRewardsService LANGUAGES CXX)
 
-SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD 17)
 
+include_directories(./include ./external)
 
-add_executable(${PROJECT_NAME} tst_testrewardsservice.cpp main.cpp)
+add_executable(${PROJECT_NAME} test/tst_testrewardsservice.cpp test/main.cpp)
 
 
 if (DEFINED ENV{CATCH_INCLUDE_DIR})
