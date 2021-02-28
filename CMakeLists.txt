@@ -4,9 +4,14 @@ project(testRewardsService LANGUAGES CXX)
 
 SET(CMAKE_CXX_STANDARD 17)
 
-include_directories(./include ./external)
+include_directories(./include
+                    ./external
+                    ./src
+                    )
 
-add_executable(${PROJECT_NAME} test/tst_testrewardsservice.cpp test/main.cpp)
+add_executable(${PROJECT_NAME} test/tst_testrewardsservice.cpp
+                               test/main.cpp
+                               )
 
 
 if (DEFINED ENV{CATCH_INCLUDE_DIR})

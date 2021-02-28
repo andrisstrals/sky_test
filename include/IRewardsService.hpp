@@ -5,6 +5,9 @@
 #include <string>
 #include <memory>
 
+#include "IEligibilityService.hpp"
+#include "Reward.hpp"
+
 class Subscription;
 class Reward;
 
@@ -21,11 +24,13 @@ public:
     virtual ~IRewardsService() = default;
 
 
-    virtual void setEligibilityService(std::shared_ptr<IEligibilityService> service) = 0;
+    virtual void setEligibilityService(std::shared_ptr<IEligibilityService<T> > service) = 0;
 
-    // rewards response returned async via Recipient interface
+
     virtual IRewardsService::Response getRewards(const T &accountNo, const std::set<Subscription> &subscriptions) = 0;
 
+    // loads rewards for subscription from external source (db, network, file, etc...)
+    virtual void loadRewards() = 0;
 
 };
 

@@ -1,6 +1,18 @@
 #include <catch2/catch.hpp>
 
-TEST_CASE("My first test with Catch2", "[fancy]")
+#include <IEligibilityService.hpp>
+#include <RewardsServiceImpl.hpp>
+
+
+#include <iostream>
+
+TEST_CASE("RewardsServiceTestnoEligibilityService", "[alone]")
 {
-    REQUIRE(0 == 0);
+
+    RewardsService<std::string> serv;
+    RewardsService<std::string>::Response resp = serv.getRewards("abc", std::set<Subscription>());
+
+    REQUIRE(resp.requestSuccessful == false);
+    REQUIRE(resp.infoMessage == "No EligibilityService available");
+
 }
