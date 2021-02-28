@@ -2,7 +2,11 @@
 #define SUBSCRIPTION_HPP
 
 
+class Subscription;
+bool operator<(const Subscription& lhs, const Subscription& rhs);
+
 class Subscription {
+    friend bool operator<(const Subscription& lhs, const Subscription& rhs);
 public:
     enum class Channel {
         SPORTS,
@@ -25,8 +29,18 @@ public:
         }
     }
 
+    // inline bool operator<(const Subscription& rhs) {
+    //     return m_channel < rhs.m_channel;
+    // }
+
 private:
     Subscription::Channel m_channel;
 };
+
+inline bool operator<(const Subscription& lhs, const Subscription& rhs) {
+    return lhs.m_channel < rhs.m_channel;
+}
+
+
 
 #endif      //SUBSCRIPTION_HPP

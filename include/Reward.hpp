@@ -1,8 +1,11 @@
 #ifndef REWARD_HPP
 #define REWARD_HPP
 
+class Reward;
+bool operator<(const Reward& lhs, const Reward& rhs);
 
 class Reward {
+    friend bool operator<(const Reward& lhs, const Reward& rhs);
 public:
     enum class EReward {
         CHAMPIONS_LEAGUE_FINAL_TICKET,
@@ -25,5 +28,8 @@ private:
     Reward::EReward m_reward;
 };
 
+inline bool operator<(const Reward& lhs, const Reward& rhs) {
+    return lhs.m_reward < rhs.m_reward;
+}
 
 #endif  //REWARD_HPP
