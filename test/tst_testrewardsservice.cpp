@@ -9,19 +9,11 @@
 #include <iostream>
 #include <memory>
 
-
-
 using trompeloeil::_;
 
-// class mockEligibility : public trompeloeil::mock_interface<IEligibilityService<std::string> > {
-// public:
-//     // MAKE_MOCK1(checkEligibility, IEligibilityService<std::string>::Eligibility(const std::string&), override);
-//     MAKE_MOCK1(checkEligibility, bool(const std::string&), override);
-// };
 
 class mockEligibility : public IEligibilityService<std::string> {
 public:
-    // MAKE_MOCK1(checkEligibility, IEligibilityService<std::string>::Eligibility(const std::string&), override);
     MAKE_MOCK1(checkEligibility, IEligibilityService<std::string>::Eligibility(const std::string&), override);
 };
 
@@ -43,7 +35,8 @@ TEST_CASE("RewardsHappyScenario") {
     serv.loadRewards();
 
     SECTION("TestEmptySubscription") {
-        FORBID_CALL(eligibility, checkEligibility(_));      // no call to eligibility expected if subs is empty
+        ALLOW_CALL(eligibility, checkEligibility(_))
+                    .RETURN(IEligibilityService<std::string>::Eligibility::CUSTOMER_ELIGIBLE);
         RewardsService<std::string>::Response resp = serv.getRewards("abc", std::set<Subscription>());
         REQUIRE(resp.requestSuccessful == true);
         REQUIRE(resp.rewards.size() == 0);
@@ -100,7 +93,7 @@ TEST_CASE("RewardsHappyScenario") {
                                      Subscription::Channel::NEWS};
 
         REQUIRE_CALL(eligibility, checkEligibility("abc"))
-                    .TIMES(3)
+                    .TIMES(1)
                     .RETURN(IEligibilityService<std::string>::Eligibility::CUSTOMER_ELIGIBLE);
 
         RewardsService<std::string>::Response resp = serv.getRewards("abc", subs);
@@ -126,12 +119,59 @@ TEST_CASE("Rewards INELIGIBLE Scenario") {
                                      Subscription::Channel::NEWS};
 
         REQUIRE_CALL(eligibility, checkEligibility("abc"))
-                    .TIMES(3)
+                    .TIMES(1)
                     .RETURN(IEligibilityService<std::string>::Eligibility::CUSTOMER_INELIGIBLE);
 
         RewardsService<std::string>::Response resp = serv.getRewards("abc", subs);
         REQUIRE(resp.requestSuccessful == true);
         REQUIRE(resp.rewards.size() == 0);
+    }
+}
+
+
+TEST_CASE("Invalid account number") {
+    RewardsService<std::string> serv;
+    mockEligibility eligibility;
+
+    serv.setEligibilityService(&eligibility);
+    serv.loadRewards();
+    SECTION("Test Multi Rewards") {
+        std::set<Subscription> subs {Subscription::Channel::SPORTS,
+                                     Subscription::Channel::MUSIC,
+                                     Subscription::Channel::MOVIES,
+                                     Subscription::Channel::KIDS,
+                                     Subscription::Channel::NEWS};
+
+        REQUIRE_CALL(eligibility, checkEligibility("abc"))
+                    .THROW(std::domain_error("Invalid account number"));
+
+        RewardsService<std::string>::Response resp = serv.getRewards("abc", subs);
+        REQUIRE(resp.requestSuccessful == false);
+        REQUIRE(resp.rewards.size() == 0);
+        REQUIRE(resp.infoMessage == "Invalid account number");
+    }
+}
+
+TEST_CASE("Technical failure") {
+    RewardsService<std::string> serv;
+    mockEligibility eligibility;
+
+    serv.setEligibilityService(&eligibility);
+    serv.loadRewards();
+    SECTION("Test Multi Rewards") {
+        std::set<Subscription> subs {Subscription::Channel::SPORTS,
+                                     Subscription::Channel::MUSIC,
+                                     Subscription::Channel::MOVIES,
+                                     Subscription::Channel::KIDS,
+                                     Subscription::Channel::NEWS};
+
+        REQUIRE_CALL(eligibility, checkEligibility("abc"))
+                    .THROW(std::runtime_error("Technical failure"));
+
+        RewardsService<std::string>::Response resp = serv.getRewards("abc", subs);
+        REQUIRE(resp.requestSuccessful == false);
+        REQUIRE(resp.rewards.size() == 0);
+        REQUIRE(resp.infoMessage == "");
     }
 }
 

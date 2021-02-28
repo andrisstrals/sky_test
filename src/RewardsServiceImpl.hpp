@@ -28,15 +28,26 @@ public:
         else {
             resp.requestSuccessful = true;
 
-            for(auto &sub : subscriptions) {
-                auto it = m_rewardsMapping.find(sub);
-                if(it != m_rewardsMapping.end()
-                        && m_eligibilityService->checkEligibility(accountNo) ==
-                                IEligibilityService<T>::Eligibility::CUSTOMER_ELIGIBLE
-                ) {
-                    resp.rewards.insert(it->second.begin(), it->second.end());
+            try {
+                if(m_eligibilityService->checkEligibility(accountNo) ==
+                                    IEligibilityService<T>::Eligibility::CUSTOMER_ELIGIBLE) {
+
+                    for(auto &sub : subscriptions) {
+                        auto it = m_rewardsMapping.find(sub);
+                        if(it != m_rewardsMapping.end()) {
+                            resp.rewards.insert(it->second.begin(), it->second.end());
+                        }
+                    }
                 }
             }
+            catch(std::domain_error &ex) {
+                resp.requestSuccessful = false;
+                resp.infoMessage = ex.what();
+            }
+            catch(...) {    //assuming some technical faoult occured
+                resp.requestSuccessful = false;
+            }
+
         }
 
         return resp;
