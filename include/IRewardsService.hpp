@@ -9,7 +9,6 @@
 #include "Reward.hpp"
 
 class Subscription;
-class Reward;
 
 template <typename T>
 class IRewardsService {
@@ -24,7 +23,8 @@ public:
     virtual ~IRewardsService() = default;
 
 
-    virtual void setEligibilityService(std::shared_ptr<IEligibilityService<T> > service) = 0;
+    // virtual void setEligibilityService(std::shared_ptr<IEligibilityService<T> > service) = 0;
+    virtual void setEligibilityService(IEligibilityService<T> *service) = 0;
 
 
     virtual IRewardsService::Response getRewards(const T &accountNo, const std::set<Subscription> &subscriptions) = 0;

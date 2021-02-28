@@ -13,7 +13,9 @@ public:
 
     // checks if provided account is eligible for rewards
     // throws exception on technical fault or invalid account number
-    virtual IEligibilityService::Eligibility checkEligibility(const T &accountNo) = 0;
+    virtual IEligibilityService::Eligibility
+     checkEligibility(const T &accountNo) = 0;
+    // virtual bool
 };
 
 #endif      //IELIGIBILITYSERVICE_HPP

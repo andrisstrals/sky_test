@@ -19,7 +19,7 @@ public:
     Subscription(Subscription::Channel channel) : m_channel(channel) {}
     ~Subscription() = default;
 
-    std::string toString() {
+    std::string toString() const {
         switch(m_channel) {
         case Subscription::Channel::SPORTS : return "SPORTS";
         case Subscription::Channel::KIDS : return "KIDS";
@@ -29,9 +29,9 @@ public:
         }
     }
 
-    // inline bool operator<(const Subscription& rhs) {
-    //     return m_channel < rhs.m_channel;
-    // }
+    Subscription::Channel getChannel() const {
+        return m_channel;
+    }
 
 private:
     Subscription::Channel m_channel;
